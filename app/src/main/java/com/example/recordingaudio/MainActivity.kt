@@ -59,10 +59,16 @@ class MainActivity : AppCompatActivity() {
         checkPermission ()
         mRecordButton = findViewById<Button>(R.id.RecordButton)
         mRecordButton.setOnClickListener {
+            val myObservable = getObservable()
+            val myObserver = getObserverRecord()
+            myObservable.subscribe(myObserver)
             startRecordingStream()
         }
         mPlayButton = findViewById<Button>(R.id.PlayButton)
         mPlayButton.setOnClickListener {
+            val myObservable = getObservable()
+            val myObserver = getObserverPlay()
+            myObservable.subscribe(myObserver)
             startPlaying() }
 
     }
@@ -133,6 +139,67 @@ class MainActivity : AppCompatActivity() {
         recorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         recorder?.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
         recorder?.setOutputFile(output)
+    }
+
+    private fun getObserverRecord(): Observer<String> {
+        return object : Observer<String> {
+            override fun onSubscribe(d: Disposable) {
+            }
+
+//Every time onNext is called, print the value to Android Studio’s Logcat//
+
+            override fun onNext(s: String) {
+                Log.d(TAG, "onNext: $s")
+                mRecordButton.text = "Stop"
+            }
+
+//Called if an exception is thrown//
+
+            override fun onError(e: Throwable) {
+                Log.e(TAG, "onError: " + e.message)
+            }
+
+//When onComplete is called, print the following to Logcat//
+
+            override fun onComplete() {
+                Log.d(TAG, "onComplete")
+                stopRecording()
+                mRecordButton.text = "Record"
+            }
+        }
+    }
+    private fun getObserverPlay(): Observer<String> {
+        return object : Observer<String> {
+            override fun onSubscribe(d: Disposable) {
+            }
+
+//Every time onNext is called, print the value to Android Studio’s Logcat//
+
+            override fun onNext(s: String) {
+                Log.d(TAG, "onNext: $s")
+                mPlayButton.text = "Stop"
+            }
+
+//Called if an exception is thrown//
+
+            override fun onError(e: Throwable) {
+                Log.e(TAG, "onError: " + e.message)
+            }
+
+//When onComplete is called, print the following to Logcat//
+
+            override fun onComplete() {
+                Log.d(TAG, "onComplete")
+                stopPlaying()
+                mPlayButton.text = "Play Back"
+            }
+        }
+    }
+
+//Give myObservable some data to emit//
+
+    private fun getObservable(): Observable<String> {
+        return Observable.just("1", "2", "3", "4", "5")
     }
 
     private fun checkPermission () {
