@@ -98,21 +98,22 @@ class MainActivity : AppCompatActivity() {
     private fun startPlaying() {
         player = MediaPlayer()
         try {
-            val count =  if(dir.exists()) {
+            var count =  if(dir.exists()) {
                dir.listFiles().size
             }else {
                 val recorderDirectory = File( Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/")
                 recorderDirectory.mkdirs()
                 dir.listFiles().size
             }
+            count--
             player!!.setDataSource(Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/recording"+count+".mp3") // pass reference to file to be played
             player!!.setAudioAttributes(
                 AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .setUsage(AudioAttributes.USAGE_MEDIA)
                     .build()
-            ) // optional step
-            player!!.prepare() // may take a while depending on the media, consider using .prepareAsync() for streaming
-        } catch (e: IOException) { // we need to catch both errors in case of invalid or inaccessible resources
+            )
+            player!!.prepare()
+        } catch (e: IOException) {
             // handle error
         } catch (e: IllegalArgumentException) {
             // handle error
@@ -144,60 +145,48 @@ class MainActivity : AppCompatActivity() {
     private fun getObserverRecord(): Observer<String> {
         return object : Observer<String> {
             override fun onSubscribe(d: Disposable) {
+                mRecordButton.text = "Stop"
             }
-
-//Every time onNext is called, print the value to Android Studio’s Logcat//
-
             override fun onNext(s: String) {
                 Log.d(TAG, "onNext: $s")
                 mRecordButton.text = "Stop"
             }
-
-//Called if an exception is thrown//
-
             override fun onError(e: Throwable) {
                 Log.e(TAG, "onError: " + e.message)
             }
-
-//When onComplete is called, print the following to Logcat//
-
             override fun onComplete() {
                 Log.d(TAG, "onComplete")
-                stopRecording()
-                mRecordButton.text = "Record"
+//                stopRecording()
+                mRecordButton.setOnClickListener {
+                    stopRecording()
+                    mRecordButton.text = "Record"
+                }
             }
         }
     }
     private fun getObserverPlay(): Observer<String> {
         return object : Observer<String> {
             override fun onSubscribe(d: Disposable) {
+                mPlayButton.text = "Stop"
             }
-
-//Every time onNext is called, print the value to Android Studio’s Logcat//
-
             override fun onNext(s: String) {
                 Log.d(TAG, "onNext: $s")
                 mPlayButton.text = "Stop"
             }
-
-//Called if an exception is thrown//
-
             override fun onError(e: Throwable) {
                 Log.e(TAG, "onError: " + e.message)
             }
-
-//When onComplete is called, print the following to Logcat//
-
             override fun onComplete() {
                 Log.d(TAG, "onComplete")
-                stopPlaying()
-                mPlayButton.text = "Play Back"
+//                stopPlaying()
+                mPlayButton.setOnClickListener {
+                    stopPlaying()
+                    mPlayButton.text = "Play Back"
+                }
+
             }
         }
     }
-
-//Give myObservable some data to emit//
-
     private fun getObservable(): Observable<String> {
         return Observable.just("1")
     }
@@ -210,5 +199,17 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, permissions,0)
         }
         checkDir()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        stopPlaying()
+        stopRecording()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopPlaying()
+        stopRecording()
     }
 }
