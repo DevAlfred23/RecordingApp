@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
     protected var player: MediaPlayer? = null
     private lateinit var mRecordButton : Button
     private lateinit var mPlayButton : Button
-    private val dir: File = File(Environment.getExternalStorageDirectory().absolutePath + "/recordAudio/")
+    private val dir: File = File(Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/")
     private var output: String? = null
 
     private fun checkDir () {
         try{
             // create a File object for the parent directory
-            val recorderDirectory = File(Environment.getExternalStorageDirectory().absolutePath+"/recordAudio/")
+            val recorderDirectory = File(Environment.getExternalStorageDirectory().absolutePath+"/recordingAndroid/")
             // have the object build the directory structure, if needed.
             recorderDirectory.mkdirs()
         }catch (e: IOException){
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         }
         if(dir.exists()){
             val count = dir.listFiles().size
-            output = Environment.getExternalStorageDirectory().absolutePath + "/recordAudio/recording"+count+".mp3"
+            output = Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/recording"+count+".mp3"
         }
         recorder = MediaRecorder()
 
@@ -101,11 +101,11 @@ class MainActivity : AppCompatActivity() {
             val count =  if(dir.exists()) {
                dir.listFiles().size
             }else {
-                val recorderDirectory = File( externalCacheDir?.absolutePath+"/recordingAndroid/")
+                val recorderDirectory = File( Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/")
                 recorderDirectory.mkdirs()
                 dir.listFiles().size
             }
-            player!!.setDataSource(externalCacheDir?.absolutePath+"/recordingAndroid/recording"+count+".mp3") // pass reference to file to be played
+            player!!.setDataSource(Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/recording"+count+".mp3") // pass reference to file to be played
             player!!.setAudioAttributes(
                 AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                     .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -133,7 +133,7 @@ class MainActivity : AppCompatActivity() {
 
         if(dir.exists()){
             val count = dir.listFiles().size
-            output = externalCacheDir?.absolutePath+"/recordingAndroid/recording"+count+".mp3"
+            output = Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/recording"+count+".mp3"
         }
         recorder?.setAudioSource(MediaRecorder.AudioSource.MIC)
         recorder?.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
@@ -199,7 +199,7 @@ class MainActivity : AppCompatActivity() {
 //Give myObservable some data to emit//
 
     private fun getObservable(): Observable<String> {
-        return Observable.just("1", "2", "3", "4", "5")
+        return Observable.just("1")
     }
 
     private fun checkPermission () {
