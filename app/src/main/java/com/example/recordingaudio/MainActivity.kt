@@ -32,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mPlayButton : Button
     private val dir: File = File(Environment.getExternalStorageDirectory().absolutePath + "/recordingAndroid/")
     private var output: String? = null
+    var mMediaPlayer: MediaPlayer? = null
+
 
     private fun checkDir () {
         try{
@@ -150,6 +152,7 @@ class MainActivity : AppCompatActivity() {
             override fun onNext(s: String) {
                 Log.d(TAG, "onNext: $s")
                 mRecordButton.text = "Stop"
+                playSound()
             }
             override fun onError(e: Throwable) {
                 Log.e(TAG, "onError: " + e.message)
@@ -201,10 +204,21 @@ class MainActivity : AppCompatActivity() {
         checkDir()
     }
 
+    fun playSound() {
+        if (mMediaPlayer == null) {
+            mMediaPlayer = MediaPlayer.create(this, R.raw.effect)
+             mMediaPlayer!!.start()
+        } else mMediaPlayer!!.start()
+    }
+    
     override fun onDestroy() {
         super.onDestroy()
         stopPlaying()
         stopRecording()
+         if (mMediaPlayer != null) {
+            mMediaPlayer!!.release()
+            mMediaPlayer = null
+            }
     }
 
     override fun onPause() {
